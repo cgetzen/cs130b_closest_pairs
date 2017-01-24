@@ -49,6 +49,9 @@ def Main():
         exit(1)
 
     collection = process_input()
+    if(len(collection) < 2):
+        print("Need to enter more than 1 point")
+        exit(1)
 
     if(argv[1] == "brute"):
         pairs, num = brute(collection)
