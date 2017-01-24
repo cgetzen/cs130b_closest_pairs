@@ -42,7 +42,7 @@ class TestClosestPairFunctions(unittest.TestCase):
     def test_inequality(self):
         self.assertFalse(Pair(1.12345679, -1) == Pair(1.12345671, -1))
 
-    def test_brute_on_all_basic_inputs(self):
+    def test_all_basic_inputs(self):
         for fnct in self.fncts:
             for collection in self.set_of_basic_collections:
                 log = logging.getLogger("test_basic_inputs")
@@ -50,11 +50,6 @@ class TestClosestPairFunctions(unittest.TestCase):
                 log.debug(collection)
                 self.assertEqual([(collection[0], collection[1])], fnct(collection))
                 self.assertEqual([(collection[0], collection[1])], fnct(collection[::-1]))
-
-    def test_basic_on_all_basic_inputs(self):
-        for collection in self.set_of_basic_collections:
-            self.assertEqual([(collection[0], collection[1])], basic(collection))
-            self.assertEqual([(collection[0], collection[1])], basic(collection[::-1]))
 
     def test_multiple(self):
         collection = [Pair(1, 1), Pair(2, 2), Pair(3, 3)]
@@ -64,19 +59,36 @@ class TestClosestPairFunctions(unittest.TestCase):
 
     def test_a_bunch_of_random(self):
         random.seed(int.from_bytes(os.urandom(4), byteorder="big"))
-        for _ in range(10):
+        for _ in range(20):
             collection = []
             for _ in range(100):
                 collection.append(Pair(random.uniform(-10000, 10000), random.uniform(-10000, 10000)))
             self.assertEqual(basic(collection), brute(collection))
             self.assertEqual(basic(collection), optimal(collection))
 
-    def test_four_by_four(self):
+    def test_10_by_10(self):
         collection = []
         for x in range(10):
             for y in range(10):
                 collection.append(Pair(x, y))
         self.assertEqual(basic(collection), brute(collection))
+        self.assertEqual(optimal(collection), brute(collection))
+
+    def test_vertical(self):
+        collection = [Pair(0, 0), Pair(0, 1), Pair(0, 2), Pair(0, 3), Pair(0, 10)]
+        self.assertEqual(basic(collection), brute(collection))
+        self.assertEqual(optimal(collection), brute(collection))
+        collection.pop()
+        self.assertEqual(basic(collection), brute(collection))
+        self.assertEqual(optimal(collection), brute(collection))
+
+    def test_horizontal(self):
+        collection = [Pair(0, 0), Pair(1, 0), Pair(2, 0), Pair(3, 0), Pair(4, 0)]
+        self.assertEqual(basic(collection), brute(collection))
+        self.assertEqual(optimal(collection), brute(collection))
+        collection.pop()
+        self.assertEqual(basic(collection), brute(collection))
+        self.assertEqual(optimal(collection), brute(collection))
 
 if __name__ == '__main__':
     logging.basicConfig(stream=sys.stderr)
