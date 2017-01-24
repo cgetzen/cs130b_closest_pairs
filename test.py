@@ -1,19 +1,31 @@
 import unittest
 import sys
 from closestPair import Pair, process_input, brute, basic, optimal
-import random, os
+import random
+import os
 import logging
+
+def monkeypatch(fnct):
+    def first_element(*args, **kw):
+        return fnct(*args, **kw)[0]
+    return first_element
+
+brute = monkeypatch(brute)
+basic = monkeypatch(basic)
+optimal = monkeypatch(optimal)
+
 
 class TestClosestPairFunctions(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
+
         self.set_of_basic_collections = [
-            [ Pair(1,1), Pair(2,2) ],
-            [ Pair(1, 1), Pair(2, 2), Pair(-10000, 10000) ],
-            [ Pair(1, 1), Pair(2, 2), Pair(500, 500), Pair(-10000, 10000) ],
-            [ Pair(1, 1), Pair(2, 2), Pair(500, 500), Pair(-10000, 10000), Pair(-10000, -10000) ],
-            [ Pair(1, 1), Pair(2, 2), Pair(500, 500), Pair(-10000, 10000), Pair(-10000, -10000), Pair(100, 100) ]
+            [Pair(1, 1), Pair(2, 2)],
+            [Pair(1, 1), Pair(2, 2), Pair(-10000, 10000)],
+            [Pair(1, 1), Pair(2, 2), Pair(500, 500), Pair(-10000, 10000)],
+            [Pair(1, 1), Pair(2, 2), Pair(500, 500), Pair(-10000, 10000), Pair(-10000, -10000)],
+            [Pair(1, 1), Pair(2, 2), Pair(500, 500), Pair(-10000, 10000), Pair(-10000, -10000), Pair(100, 100)]
 
         ]
         self.w = Pair(1.12345677, -1)
@@ -33,22 +45,22 @@ class TestClosestPairFunctions(unittest.TestCase):
     def test_brute_on_all_basic_inputs(self):
         for fnct in self.fncts:
             for collection in self.set_of_basic_collections:
-                log= logging.getLogger( "test_basic_inputs" )
-                log.debug( "Function= {}".format(fnct.__qualname__) )
+                log = logging.getLogger("test_basic_inputs")
+                log.debug("Function= {}".format(fnct.__qualname__))
                 log.debug(collection)
-                self.assertEqual( [(collection[0], collection[1])], fnct(collection) )
-                self.assertEqual( [(collection[0], collection[1])], fnct(collection[::-1]) )
+                self.assertEqual([(collection[0], collection[1])], fnct(collection))
+                self.assertEqual([(collection[0], collection[1])], fnct(collection[::-1]))
 
     def test_basic_on_all_basic_inputs(self):
         for collection in self.set_of_basic_collections:
-            self.assertEqual( [(collection[0], collection[1])], basic(collection) )
-            self.assertEqual( [(collection[0], collection[1])], basic(collection[::-1]) )
+            self.assertEqual([(collection[0], collection[1])], basic(collection))
+            self.assertEqual([(collection[0], collection[1])], basic(collection[::-1]))
 
     def test_multiple(self):
-        collection = [Pair(1,1), Pair(2,2), Pair(3,3)]
-        self.assertEqual( [(collection[0], collection[1]), (collection[1], collection[2])], brute(collection))
-        self.assertEqual( [(collection[0], collection[1]), (collection[1], collection[2])], basic(collection))
-        self.assertEqual( [(collection[0], collection[1]), (collection[1], collection[2])], optimal(collection))
+        collection = [Pair(1, 1), Pair(2, 2), Pair(3, 3)]
+        self.assertEqual([(collection[0], collection[1]), (collection[1], collection[2])], brute(collection))
+        self.assertEqual([(collection[0], collection[1]), (collection[1], collection[2])], basic(collection))
+        self.assertEqual([(collection[0], collection[1]), (collection[1], collection[2])], optimal(collection))
 
     def test_a_bunch_of_random(self):
         random.seed(int.from_bytes(os.urandom(4), byteorder="big"))
@@ -67,15 +79,7 @@ class TestClosestPairFunctions(unittest.TestCase):
         self.assertEqual(basic(collection), brute(collection))
 
 if __name__ == '__main__':
-    logging.basicConfig( stream=sys.stderr )
-    logging.getLogger( "test_basic_inputs" ).setLevel( logging.NOTSET )
+    logging.basicConfig(stream=sys.stderr)
+    logging.getLogger("test_basic_inputs").setLevel(logging.NOTSET)
 
     unittest.main()
-
-
-
-    def test_brute_is_correct_on_all_inputs(self):
-        for collection in set_of_collections:
-            assert( [(collection[0], collection[1])] ==  brute(collection) )
-            collection.reverse()
-            assert( [(collection[-1], collection[-2])] == brute(collection) )
