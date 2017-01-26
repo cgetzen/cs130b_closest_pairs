@@ -7,7 +7,7 @@ import logging
 
 def monkeypatch(fnct):
     def first_element(*args, **kw):
-        return fnct(*args, **kw)[0]
+        return sorted(list(set(fnct(*args, **kw)[0])))
     return first_element
 
 brute = monkeypatch(brute)

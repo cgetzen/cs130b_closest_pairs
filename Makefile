@@ -10,4 +10,4 @@ randData: randData.py
 	chmod +=x randData
 
 clean:
-		rm -rf __pycache__ *.pyc closestPair randData
+		rm -rf __pycache__ *.pyc closestPair randData *pickle*

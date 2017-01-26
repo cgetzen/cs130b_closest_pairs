@@ -48,7 +48,7 @@ def Main():
         print("closestPair [brute|basic|optimal]")
         exit(1)
 
-    collection = process_input()
+    collection = list(set(process_input()))
     if(len(collection) < 2):
         print("Need to enter more than 1 point")
         exit(1)
@@ -61,7 +61,7 @@ def Main():
         pairs, num = optimal(collection)
 
     print("closest pair distance: {}".format(num))
-    for pair in pairs:
+    for pair in sorted(list(set(pairs))):
         print(pair[0], " ", pair[1])
 
 def brute(collection):
@@ -83,8 +83,6 @@ def basic(collection):
     return optimal(collection, False)
 
 def optimal(collection, optimal=True):
-    collection = list(set(collection))  # O(n)
-    sorted_x = sorted(collection, key=lambda pair: pair.x)  # O(n log n)
 
     def solve(collection, sorted_y=None):
         if(len(collection) == 1):
@@ -105,7 +103,7 @@ def optimal(collection, optimal=True):
         d_2 = right[0][1] - right[0][0] if (len(right[0]) == 2) else float('inf')
         d = min(d_1, d_2)
 
-        ans = [s for side, dist in zip((left, right), (d_1, d_2)) if dist == d for s in side]
+        ans = left + right if d_1 == d_2 else left if d_1 == d else right
 
         if(optimal):  # No need to sort, already sorted in sorted_y. O(n)
             collection = [pair for pair in sorted_y if median_x - d <= pair.x <= median_x + d]
@@ -115,27 +113,23 @@ def optimal(collection, optimal=True):
 
         for index, pair in enumerate(collection):  # O(n)
             j = index - 1
-            x = 0
             while(j >= 0 and pair.y - collection[j].y <= d):  # O(1)
-                x += 1
-                if(x > 6):
-                    assert(False)
-                if (collection[j], pair) in ans or (pair, collection[j]) in ans:
-                    pass
-                elif (collection[j] - pair == d):
+                if (collection[j] - pair == d):
                     ans.append(Pair.order(collection[j], pair))
                 elif(collection[j] - pair < d):
                     ans = [Pair.order(collection[j], pair)]
                     d = collection[j] - pair
                 j -= 1
+            assert(index - j <= 6)
         return ans
 
+    sorted_x = sorted(collection, key=lambda pair: pair.x)  # O(n log n)
     if(optimal):
         sorted_y = sorted(collection, key=lambda pair: pair.y)  # O(n log n)
-        ans = sorted(solve(sorted_x, sorted_y))
+        ans = solve(sorted_x, sorted_y)
         return ans, ans[0][0] - ans[0][1]
     else:
-        ans = sorted(solve(sorted_x))
+        ans = solve(sorted_x)
         return ans, ans[0][0] - ans[0][1]
 
 def process_input():
@@ -149,7 +143,7 @@ def process_input():
             except:
                 pass
     except:
-        return sorted(collection)
+        return collection
 
 
 if __name__ == "__main__":
